@@ -1,0 +1,68 @@
+name: 'Lint'
+description: 'Lint code'
+inputs:
+  org_github_token:
+    description: 'Github org token'
+    required: true
+  python-version:
+    description: 'Python version'
+    required: true
+  pypi-user:
+    description: 'PyPi user'
+    required: true
+  python-password:
+    description: 'PyPi password'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    ## Clone do código
+    - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+    - name: Checkout repo config
+      uses: actions/checkout@v3
+      with:
+        repository: zapay-pagamentos/repo-config
+        token: ${{ inputs.org_github_token }}
+        path: repo-config
+    - name: Config repo settings
+      uses: zapay-pagamentos/zpy-platform-k8s-repo-config-action@main
+      with:
+        python_version: ${{ inputs.python-version }}
+        fastapi: true
+        django: false
+        pre_commit: true
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: /opt/hostedtoolcache/Python/${{ inputs.python-version }}/x64/
+        key: python${{ inputs.python-version }}-${{ runner.os }}-requirements-${{ hashFiles('requirements.txt') }}
+    - name: Install and configure Pre-commit
+      env:
+        PYPI_USER: ${{ inputs.pypi-user }}
+        PYPI_PASSWORD: ${{ inputs.python-password }}
+      run: |
+        pip install pre-commit pylint pylint-django pylint-plugin-utils pylint-pydantic
+        pip install poetry
+        poetry config virtualenvs.create false
+        poetry config http-basic.zapay-pypi $PYPI_USER $PYPI_PASSWORD
+        poetry install --no-interaction --no-ansi -vvv
+    - name: Cache pre commit hooks
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pre-commit
+        key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('.github/workflows/lint.yml') }}
+    - name: Cache mypy types
+      uses: actions/cache@v3
+      with:
+        path: .mypy_cache
+        key: ${{ runner.os }}-mypy-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('mypy.ini') }}
+    - name: Run Pre-commit
+      run: |
+        pre-commit run --from-ref origin/${{ github.event.pull_request.base.ref }} --to-ref HEAD
