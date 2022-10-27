@@ -10,7 +10,7 @@ inputs:
   pypi-user:
     description: 'PyPi user'
     required: true
-  python-password:
+  pypi-password:
     description: 'PyPi password'
     required: true
 
@@ -46,7 +46,7 @@ runs:
     - name: Install and configure Pre-commit
       env:
         PYPI_USER: ${{ inputs.pypi-user }}
-        PYPI_PASSWORD: ${{ inputs.python-password }}
+        PYPI_PASSWORD: ${{ inputs.pypi-password }}
       shell: bash
       run: |
         pip install pre-commit pylint pylint-django pylint-plugin-utils pylint-pydantic
