@@ -19,8 +19,8 @@ runs:
   steps:
     ## Clone do código
     - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      with:
+        fetch-depth: 0
     - name: Checkout repo config
       uses: actions/checkout@v3
       with:
