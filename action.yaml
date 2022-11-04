@@ -3,7 +3,7 @@ description: 'Lint code'
 inputs:
   org_github_token:
     description: 'Github org token'
-    required: true
+    required: false
   python-version:
     description: 'Python version'
     required: true
@@ -21,19 +21,6 @@ runs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Checkout repo config
-      uses: actions/checkout@v3
-      with:
-        repository: zapay-pagamentos/repo-config
-        token: ${{ inputs.org_github_token }}
-        path: repo-config
-    - name: Config repo settings
-      uses: zapay-pagamentos/zpy-platform-k8s-repo-config-action@main
-      with:
-        python_version: ${{ inputs.python-version }}
-        fastapi: true
-        django: false
-        pre_commit: true
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
