@@ -21,15 +21,6 @@ runs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ inputs.python-version }}
-    - name: Cache pip
-      uses: actions/cache@v3
-      with:
-        path: /opt/hostedtoolcache/Python/${{ inputs.python-version }}/x64/
-        key: python${{ inputs.python-version }}-${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
     - name: Install and configure Pre-commit
       env:
         PYPI_USER: ${{ inputs.pypi-user }}
