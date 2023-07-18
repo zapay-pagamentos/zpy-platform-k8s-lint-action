@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: zpy-platform-k8s-lint-action
+  description: Github Action to lint app code
+  annotations:
+    github.com/project-slug: zapay-pagamentos/zpy-platform-k8s-lint-action
+spec:
+  type: library
+  lifecycle: production
+  owner: darrell
